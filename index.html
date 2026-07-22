@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Format Laporan Withdraw</title>
+<meta name="description" content="Alat internal untuk merapikan data withdraw mentah jadi laporan siap kirim.">
+<meta name="robots" content="index, follow" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script type="module" crossorigin src="./assets/index-CpBcG3kM.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-DEz49goD.css">
+</head>
+<body>
+
+<!-- Loading Screen Overlay -->
+<div id="loading-screen">
+  <div class="loading-card">
+    <img id="loading-gif" src="" alt="Loading..." class="loading-gif">
+    <div class="loading-label" id="loading-label">Memuat...</div>
+    <div class="loading-dots">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</div>
+
+<!-- Background slideshow -->
+<div id="bg-slideshow"></div>
+<div id="bg-overlay"></div>
+
+<!-- Kunang-kunang canvas — z-index di belakang panel -->
+<canvas id="fireflyField" aria-hidden="true"></canvas>
+
+<!-- Dot indicator slideshow -->
+<div class="bg-indicator" id="bgIndicator"></div>
+
+<div class="page">
+
+  <header class="banner">
+    <div class="banner-overlay"></div>
+    <div class="banner-inner">
+      <div class="brand">
+        <img src="https://lrstore.id/assets/logo/asset-lg-lr-bos.png" class="brand-logo" alt="Logo LR Bos">
+        <div class="brand-text">
+          <h1>Format Laporan <em>Withdraw</em></h1>
+          <p class="brand-tag">Tempel data mentah &rarr; hasil rapi, siap kirim</p>
+        </div>
+      </div>
+      <div class="status-pill" id="liveStatus">
+        <span class="dot"></span> Siap memproses
+      </div>
+    </div>
+  </header>
+
+  <main class="grid">
+
+    <!-- INPUT -->
+    <section class="panel panel-in" style="--delay:0">
+      <div class="panel-title">
+        <span>Data Mentah</span>
+        <span class="hint">tempel di sini</span>
+      </div>
+
+      <textarea id="rawInput" spellcheck="false" placeholder="Tempel data hasil copy dari tabel/excel di sini.
+
+Format kolom (dipisah TAB):
+No  User  Bank Nama Rekening  Bank Nomor Rekening  Jenis Bank  Order Id  Third Id  Tanggal Awal  Success Data  Jumlah  Status  info  Tools
+
+Baris header boleh disertakan atau tidak, sistem mendeteksi otomatis. Kolom kosong ganda (dobel TAB) sekarang otomatis dibersihkan."></textarea>
+
+      <div class="meta-row">
+        <label class="field">
+          <span>Info</span>
+          <input type="text" id="infoField" value="Angkabet167">
+        </label>
+        <label class="field">
+          <span>Akun</span>
+          <input type="text" id="akunField" value="SMB34">
+        </label>
+      </div>
+
+      <label class="field">
+        <span>Perihal</span>
+        <input type="text" id="perihalField" value="Transaksi Withdraw Minerapay Pending">
+      </label>
+
+      <label class="field">
+        <span>Catatan Penutup</span>
+        <textarea class="short" id="notesField">Untuk Saat ini Terdapat Transaksi Pengiriman Dana Autowd minera Yang sedang dalam status pending, Perihal ini di bantu pengecekannya ya ko/ci dan perihal withdraw tersebut akan di cek secara berkala dan menunggu keputusan final dari pihak Minerapay ya ko/ci.</textarea>
+      </label>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="parseBtn">
+          <span>Proses jadi laporan</span>
+        </button>
+        <button class="btn btn-ghost" id="clearBtn">Bersihkan</button>
+      </div>
+
+      <div class="status-line" id="parseStatus">Menunggu data...</div>
+    </section>
+
+    <!-- OUTPUT -->
+    <section class="panel panel-in" style="--delay:1">
+      <div class="panel-title">
+        <span>Hasil Laporan</span>
+        <span class="count" id="rowCount">0 transaksi</span>
+      </div>
+
+      <div class="output" id="outputBox">Hasil akan muncul di sini setelah data diproses.</div>
+
+      <div class="copy-row">
+        <button class="btn btn-primary" id="copyBtn">Salin teks</button>
+      </div>
+    </section>
+
+    <!-- LINKS -->
+    <section class="panel panel-full panel-in" style="--delay:2">
+      <div class="panel-title">
+        <span>Lampiran &middot; Link Screenshot</span>
+        <span class="count" id="linkCount">0 link</span>
+      </div>
+      <div id="linkList" class="link-list"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="addLinkBtn">+ Tambah link</button>
+      </div>
+      <div class="status-line">Link yang diisi otomatis masuk ke teks hasil, di bawah daftar transaksi dan sebelum catatan penutup.</div>
+    </section>
+
+    <!-- FILE ATTACH -->
+    <section class="panel panel-full panel-in" style="--delay:3">
+      <div class="panel-title">
+        <span>Lampiran Tambahan &middot; Upload Gambar (opsional)</span>
+        <span class="count" id="lampCount">0 file</span>
+      </div>
+      <div class="lamp-zone" id="lampZone">
+        <span>Klik atau tarik gambar screenshot ke sini untuk disimpan sebagai preview.</span>
+        <small>Tidak ikut masuk ke teks hasil &mdash; hanya untuk dilihat bersama laporan.</small>
+        <input type="file" id="lampInput" accept="image/*" multiple hidden>
+      </div>
+      <div class="thumbs" id="thumbs"></div>
+    </section>
+
+  </main>
+
+  <footer class="foot">
+    <span>Dibuat untuk mempercepat pelaporan withdraw &middot; berjalan sepenuhnya di browser, tidak ada data yang dikirim ke server manapun.</span>
+  </footer>
+</div>
+
+<div class="toast" id="toast">Tersalin ke clipboard</div>
+
+</body>
+</html>
